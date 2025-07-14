@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pemilihan Ketua Kelas 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body { margin:0; font-family:'Poppins','Nunito',sans-serif; background:#fff; }
+header { background:#A3D9A5; color:#fff; text-align:center; padding:2rem; border-bottom:5px solid #F7E87B; }
+h1 { font-size:2.5rem; margin:0; } .subtitle { font-size:1.2rem; }
+.total-voters { text-align:center; font-size:1.2rem; margin-top:.5rem; color:#333; }
+.candidates { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.5rem; padding:2rem; max-width:1200px; margin:auto; }
+.card { border-radius:1.5rem; box-shadow:0 8px 16px rgba(0,0,0,0.15); text-align:center; padding:1rem; transition:transform .3s; }
+.card:hover { transform:translateY(-5px); }
+.avatar { width:120px; border-radius:50%; margin-bottom:1rem; transition:transform .3s ease; }
+.card:hover .avatar { transform:rotate(-5deg) scale(1.05); }
+.vote-btn, .next-btn, .reset-btn, .edit-btn { background:#89CFF0; color:#fff; border:none; border-radius:2rem; padding:.7rem 1.5rem; font-size:1rem; cursor:pointer; margin:.5rem .2rem; transition:background .3s; }
+.vote-btn:hover, .next-btn:hover, .reset-btn:hover, .edit-btn:hover { background:#66B2FF; }
+.percent, .count { margin-top:.5rem; font-weight:bold; color:#4CAF50; }
+#next-btn, #reset-btn { display:block; margin:1rem auto; }
+footer { text-align:center; padding:1rem; background:#A3D9A5; color:#fff; font-size:.9rem; }
+.confetti { position:fixed; width:8px; height:8px; border-radius:50%; animation:fall 1.5s linear; }
+@keyframes fall { to { transform:translateY(100vh) rotate(360deg); opacity:0; } }
+/* 🎨 Warna berbeda setiap calon */
+.card-1 { background:#A3D9A5; } /* Hijau pastel */
+.card-2 { background:#89CFF0; } /* Biru muda */
+.card-3 { background:#F7E87B; } /* Kuning pastel */
+.card-4 { background:#F7B7A3; } /* Merah pastel */
+</style>
+</head>
+<body>
+<header>
+  <h1>Pilih Ketua Kelasmu!</h1>
+  <p class="subtitle">Kelas 6 – Suara kamu menentukan</p>
+  <p class="total-voters">👩‍🎓 Total Pemilih: <span id="total-voters">0</span></p>
+</header>
+<main>
+  <div class="candidates">
+    <div class="card card-1" data-id="1">
+      <img class="avatar" src="data:image/png;base64,AVATAR_BASE64_1" alt="Calon 1">
+      <h2 contenteditable="true">Raisa Putri</h2>
+      <p contenteditable="true">Aktif, ramah, dan bertanggung jawab.</p>
+      <button class="vote-btn">Pilih</button>
+      <button class="edit-btn">✏️ Edit</button>
+      <div class="percent" id="percent-1">0%</div>
+      <div class="count" id="count-1">0 Suara</div>
+    </div>
+    <div class="card card-2" data-id="2">
+      <img class="avatar" src="data:image/png;base64,AVATAR_BASE64_2" alt="Calon 2">
+      <h2 contenteditable="true">Arif Nugraha</h2>
+      <p contenteditable="true">Pintar, disiplin, dan suka membantu.</p>
+      <button class="vote-btn">Pilih</button>
+      <button class="edit-btn">✏️ Edit</button>
+      <div class="percent" id="percent-2">0%</div>
+      <div class="count" id="count-2">0 Suara</div>
+    </div>
+    <div class="card card-3" data-id="3">
+      <img class="avatar" src="data:image/png;base64,AVATAR_BASE64_3" alt="Calon 3">
+      <h2 contenteditable="true">Nadya Zahra</h2>
+      <p contenteditable="true">Kreatif, ceria, dan suka bekerjasama.</p>
+      <button class="vote-btn">Pilih</button>
+      <button class="edit-btn">✏️ Edit</button>
+      <div class="percent" id="percent-3">0%</div>
+      <div class="count" id="count-3">0 Suara</div>
+    </div>
+    <div class="card card-4" data-id="4">
+      <img class="avatar" src="data:image/png;base64,AVATAR_BASE64_4" alt="Calon 4">
+      <h2 contenteditable="true">Dimas Pratama</h2>
+      <p contenteditable="true">Berani, jujur, dan penuh ide.</p>
+      <button class="vote-btn">Pilih</button>
+      <button class="edit-btn">✏️ Edit</button>
+      <div class="percent" id="percent-4">0%</div>
+      <div class="count" id="count-4">0 Suara</div>
+    </div>
+  </div>
+  <button id="next-btn">👩‍🎓 Siswa Berikutnya</button>
+  <button id="reset-btn" class="reset-btn">🔄 Reset Semua</button>
+</main>
+<footer>Dibuat oleh Rony Hidayat 📚✏️</footer>
+<audio id="click-sound" src="data:audio/mpeg;base64,BASE64_CLICK_SOUND"></audio>
+<script>
+let votes=[0,0,0,0];
+let hasVoted=false;
+document.querySelectorAll('.vote-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    if(hasVoted) return alert('Siswa ini sudah memilih! Klik "Siswa Berikutnya" untuk berganti.');
+    const i=+btn.parentNode.dataset.id-1;
+    votes[i]++;
+    hasVoted=true;
+    document.getElementById('click-sound').play();
+    launchConfetti(); update();
+  };
+});
+document.getElementById('next-btn').onclick=()=>{
+  hasVoted=false;
+  alert('Giliran siswa berikutnya!');
+};
+document.getElementById('reset-btn').onclick=()=>{
+  votes=[0,0,0,0];
+  hasVoted=false;
+  update();
+  alert('Semua data telah direset!');
+};
+function update(){
+  const total=votes.reduce((a,b)=>a+b,0);
+  document.getElementById('total-voters').innerText=total;
+  votes.forEach((v,i)=>{
+    document.getElementById(`percent-${i+1}`).innerText= total? (v/total*100).toFixed(1)+'%':'0%';
+    document.getElementById(`count-${i+1}`).innerText= `${v} Suara`;
+  });
+}
+function launchConfetti(){
+  for(let i=0;i<50;i++){
+    const d=document.createElement('div');
+    d.className='confetti';
+    d.style.left=Math.random()*100+'vw';
+    d.style.backgroundColor=['#F7E87B','#A3D9A5','#89CFF0'][Math.floor(Math.random()*3)];
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),2000);
+  }
+}
+update();
+</script>
+</body>
+</html>
